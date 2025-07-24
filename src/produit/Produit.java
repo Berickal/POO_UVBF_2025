@@ -3,26 +3,42 @@ package produit;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Classe représentant un produit dans le système e-commerce
+ * Gère les informations de base d'un produit et sa recherche
+ */
 public class Produit {
 
+    // Compteur statique pour générer des IDs uniques
     private static int nbrProduits = 0;
-    private static List<Produit> allProducts = new ArrayList<>(); // Added: Global product database
 
-    private int id;
-    private String nom;
-    private String description;
-    private float prix;
+    // AJOUT: Base de données globale de tous les produits pour une recherche plus rapide
+    private static List<Produit> db = new ArrayList<>();
 
+    // Attributs du produit
+    private int id;              // Identifiant unique du produit
+    private String nom;          // Nom du produit
+    private String description;  // Description détaillée
+    private float prix;          // Prix en euros
+
+    /**
+     * Constructeur pour créer un nouveau produit
+     * L'ID est généré automatiquement et le produit est ajouté à la base globale
+     * @param nom Nom du produit
+     * @param description Description du produit
+     * @param prix Prix du produit en euros
+     */
     public Produit(String nom, String description, float prix){
-        this.id = nbrProduits;
+        this.id = nbrProduits;           // Attribution d'un ID unique
         this.nom = nom;
         this.description = description;
         this.prix = prix;
 
-        nbrProduits += 1;
-        allProducts.add(this); // Add to global product list
+        nbrProduits += 1;                // Incrémentation du compteur global
+        db.add(this);          // Ajout à la base de données globale
     }
 
+    // Getters - méthodes d'accès aux attributs
     public int getId(){
         return this.id;
     }
@@ -39,6 +55,7 @@ public class Produit {
         return this.prix;
     }
 
+    // Setters - méthodes de modification des attributs
     public void setDescription(String description) {
         this.description = description;
     }
@@ -51,22 +68,13 @@ public class Produit {
         this.prix = prix;
     }
 
-    // Fixed: Array bounds exception (changed <= to <)
+    /**
+     * CORRECTION: Recherche d'un produit par ID dans la base de données
+     * @param id Identifiant du produit recherché
+     * @return Le produit trouvé ou null si non trouvé
+     */
     public static Produit findProduitById(int id){
-        List<Category> categories = Category.findTouteCategory();
-        for (int i = 0; i < categories.size(); i++){
-            for (int j = 0; j < categories.get(i).getProduits().size(); j++){ // Fixed: < instead of <=
-                if (categories.get(i).getProduits().get(j).getId() == id){
-                    return categories.get(i).getProduits().get(j);
-                }
-            }
-        }
-        return null;
-    }
-
-    // Alternative faster search using global product list
-    public static Produit findProduitByIdFast(int id){
-        for(Produit produit : allProducts){
+        for(Produit produit : db){
             if(produit.getId() == id){
                 return produit;
             }
@@ -74,12 +82,16 @@ public class Produit {
         return null;
     }
 
-    // Fixed: Made save method public
+    /**
+     * Ajoute le produit à une catégorie spécifique avec vérification des doublons
+     * @param categorieNom Nom de la catégorie de destination
+     */
     public void saveToCategory(String categorieNom){
         Category category = Category.findByNom(categorieNom);
         if (category != null){
             ArrayList<Produit> produits = category.getProduits();
-            // Check if product already exists in category
+
+            // Vérification si le produit existe déjà dans cette catégorie
             boolean exists = false;
             for(Produit p : produits){
                 if(p.getId() == this.getId()){
@@ -87,6 +99,7 @@ public class Produit {
                     break;
                 }
             }
+
             if(!exists){
                 produits.add(this);
                 category.setProduits(produits);
@@ -99,19 +112,30 @@ public class Produit {
         }
     }
 
-    // Added: Get all products
+    /**
+     * Obtenir tous les produits du système
+     * @return Copie de la liste de tous les produits
+     */
     public static List<Produit> getAllProducts(){
-        return new ArrayList<>(allProducts);
+        return new ArrayList<>(db);
     }
 
-    // Added: Remove product from all categories
+    /**
+     * Supprimer le produit de toutes les catégories
+     * Utile lors de la suppression définitive d'un produit
+     */
     public void removeFromAllCategories(){
         List<Category> categories = Category.findTouteCategory();
         for(Category category : categories){
+            // Suppression par condition sur l'ID
             category.getProduits().removeIf(p -> p.getId() == this.getId());
         }
     }
 
+    /**
+     * Représentation textuelle du produit pour l'affichage
+     * @return Description formatée du produit
+     */
     @Override
     public String toString(){
         return String.format("Produit{id=%d, nom='%s', prix=%.2f€}", id, nom, prix);

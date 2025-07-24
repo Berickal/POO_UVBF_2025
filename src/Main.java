@@ -1,63 +1,83 @@
 import account.Account;
 import account.Admin;
 import account.User;
+import commande.QteProduit;
 import produit.Category;
 import produit.Produit;
 import commande.Panier;
-import commande.QteProduit;
 
 import java.util.Scanner;
 import java.util.List;
 
+/**
+ * Classe principale du système e-commerce
+ * Gère l'interface utilisateur en ligne de commande et les interactions
+ */
 public class Main {
+    // Scanner global pour la saisie utilisateur
     private static Scanner scanner = new Scanner(System.in);
-    private static User currentUser = null;
-    private static Admin currentAdmin = null;
-    private static Panier currentPanier = null;
 
+    // Variables de session pour l'utilisateur connecté
+    private static User currentUser = null;           // Utilisateur actuellement connecté
+    private static Admin currentAdmin = null;         // Administrateur actuellement connecté
+    private static Panier currentPanier = null;      // Panier de l'utilisateur connecté
+
+    /**
+     * Point d'entrée principal du programme
+     * Initialise les données d'exemple et lance la boucle principale
+     */
     public static void main(String[] args) {
         System.out.println("=== Bienvenue dans notre E-Shop ===");
 
-        // Initialize some sample data
+        // Initialisation des données d'exemple pour tester le système
         initializeSampleData();
 
+        // Boucle principale du programme
         while (true) {
             if (currentUser == null && currentAdmin == null) {
-                showMainMenu();
+                showMainMenu();           // Menu principal si personne n'est connecté
             } else if (currentUser != null) {
-                showUserMenu();
+                showUserMenu();           // Menu utilisateur si un utilisateur est connecté
             } else if (currentAdmin != null) {
-                showAdminMenu();
+                showAdminMenu();          // Menu administrateur si un admin est connecté
             }
         }
     }
 
+    /**
+     * Initialise des données d'exemple pour démontrer le système
+     * Crée des catégories, produits et un compte administrateur
+     */
     private static void initializeSampleData() {
-        // Create sample categories
+        // Création des catégories d'exemple
         Category electronics = new Category("Électronique", "Appareils électroniques et gadgets");
         Category clothing = new Category("Vêtements", "Vêtements pour hommes et femmes");
         Category books = new Category("Livres", "Livres et magazines");
 
-        // Create sample products
+        // Création des produits d'exemple
         Produit laptop = new Produit("Laptop HP", "Ordinateur portable HP 15 pouces", 799.99f);
         Produit phone = new Produit("Smartphone Samsung", "Galaxy S23 128GB", 599.99f);
         Produit tshirt = new Produit("T-Shirt", "T-Shirt en coton 100%", 19.99f);
         Produit jeans = new Produit("Jeans", "Jeans bleu délavé", 49.99f);
         Produit novel = new Produit("Roman", "Best-seller français", 12.99f);
 
-        // Add products to categories (this would need the save method to be public)
+        // Ajout des produits aux catégories correspondantes
         electronics.getProduits().add(laptop);
         electronics.getProduits().add(phone);
         clothing.getProduits().add(tshirt);
         clothing.getProduits().add(jeans);
         books.getProduits().add(novel);
 
-        // Create sample admin
+        // Création d'un compte administrateur par défaut
         Admin admin = new Admin("Admin", "Super", "admin@eshop.com", "admin123");
 
         System.out.println("Données d'exemple chargées !");
     }
 
+    /**
+     * Affiche le menu principal pour les utilisateurs non connectés
+     * Propose l'inscription, la connexion, ou la navigation en tant qu'invité
+     */
     private static void showMainMenu() {
         System.out.println("\n=== MENU PRINCIPAL ===");
         System.out.println("1. S'inscrire comme utilisateur");
@@ -68,30 +88,35 @@ public class Main {
         System.out.print("Votre choix : ");
 
         int choice = scanner.nextInt();
-        scanner.nextLine(); // consume newline
+        scanner.nextLine(); // Consommer le caractère de nouvelle ligne
 
+        // Traitement du choix de l'utilisateur
         switch (choice) {
             case 1:
-                registerUser();
+                registerUser();    // Inscription d'un nouvel utilisateur
                 break;
             case 2:
-                loginUser();
+                loginUser();       // Connexion utilisateur
                 break;
             case 3:
-                loginAdmin();
+                loginAdmin();      // Connexion administrateur
                 break;
             case 4:
-                browseCatalog();
+                browseCatalog();   // Navigation invité
                 break;
             case 5:
                 System.out.println("Merci de votre visite !");
-                System.exit(0);
+                System.exit(0);    // Fermeture du programme
                 break;
             default:
                 System.out.println("Choix invalide !");
         }
     }
 
+    /**
+     * Affiche le menu utilisateur pour les clients connectés
+     * Propose les fonctionnalités de shopping et de gestion de compte
+     */
     private static void showUserMenu() {
         System.out.println("\n=== MENU UTILISATEUR ===");
         System.out.println("Connecté en tant que: " + currentUser.getPrenom() + " " + currentUser.getNom());
@@ -104,26 +129,27 @@ public class Main {
         System.out.print("Votre choix : ");
 
         int choice = scanner.nextInt();
-        scanner.nextLine(); // consume newline
+        scanner.nextLine(); // Consommer le caractère de nouvelle ligne
 
+        // Traitement des actions utilisateur
         switch (choice) {
             case 1:
-                browseCatalog();
+                browseCatalog();      // Parcourir les produits
                 break;
             case 2:
-                viewCart();
+                viewCart();           // Afficher le panier
                 break;
             case 3:
-                addToCart();
+                addToCart();          // Ajouter au panier
                 break;
             case 4:
-                validateOrder();
+                validateOrder();      // Passer commande
                 break;
             case 5:
-                manageAddress();
+                manageAddress();      // Gérer l'adresse de livraison
                 break;
             case 6:
-                logout();
+                logout();             // Déconnexion
                 break;
             default:
                 System.out.println("Choix invalide !");
@@ -179,12 +205,20 @@ public class Main {
         }
     }
 
+    /**
+     * CORRECTION: Processus d'inscription d'un nouvel utilisateur
+     * Utilise le constructeur par défaut de User qui demande les informations
+     */
     private static void registerUser() {
         System.out.println("\n=== INSCRIPTION UTILISATEUR ===");
-        User newUser = new User();
+        User newUser = new User();  // Le constructeur gère la saisie et la validation
         System.out.println("Inscription réussie !");
     }
 
+    /**
+     * CORRECTION: Processus de connexion utilisateur amélioré
+     * Vérifie l'existence de l'email et valide le mot de passe
+     */
     private static void loginUser() {
         System.out.println("\n=== CONNEXION UTILISATEUR ===");
         System.out.print("Email : ");
@@ -192,13 +226,15 @@ public class Main {
         System.out.print("Mot de passe : ");
         String password = scanner.nextLine();
 
+        // Vérification de l'existence de l'email
         if (Account.isEmailExist(email)) {
             currentUser = new User();
+            // CORRECTION: Utilisation du booléen de retour pour valider la connexion
             if(currentUser.connecter(email, password)){
-                currentPanier = new Panier(currentUser);
+                currentPanier = new Panier(currentUser);  // Création du panier
                 System.out.println("Connexion réussie !");
             } else {
-                currentUser = null;
+                currentUser = null;  // Réinitialisation en cas d'échec
                 System.out.println("Mot de passe incorrect !");
             }
         } else {
@@ -206,6 +242,10 @@ public class Main {
         }
     }
 
+    /**
+     * Processus de connexion administrateur
+     * Utilise des identifiants fixes pour la démonstration
+     */
     private static void loginAdmin() {
         System.out.println("\n=== CONNEXION ADMINISTRATEUR ===");
         System.out.print("Email : ");
@@ -213,7 +253,7 @@ public class Main {
         System.out.print("Mot de passe : ");
         String password = scanner.nextLine();
 
-        // Simple admin check (in real app, this would be more secure)
+        // Vérification simple des identifiants admin (à sécuriser en production)
         if (email.equals("admin@eshop.com") && password.equals("admin123")) {
             currentAdmin = new Admin("Admin", "Super", email, password);
             System.out.println("Connexion administrateur réussie !");

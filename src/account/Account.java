@@ -5,28 +5,23 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * Classe mère pour les comptes utilisateurs (Client et Admin)
- *
- * @author Bérickal
+ * Classe de base pour tous les comptes utilisateurs
+ * Gère l'authentification et les informations de base des comptes
  */
 public class Account {
 
-    //Base de données fictive pour le stockage des données
+    // Base de données statique pour stocker tous les comptes
     private static List<Account> db = new ArrayList<>();
 
+    // Informations personnelles du compte
     private String nom;
-
     private String prenom;
-
     private String email;
-
-    protected String password;
+    protected String password; // Protégé pour permettre l'accès aux classes filles
 
     /**
-     * Constructeur par défaut : l'utilisateur devra renseigner manuellement les
-     * information relative au compte.
-     * Sauvegarde les informations du compte à la fin du process.
-     * Controle préalable du mail afin d'éviter les doublons.
+     * Constructeur par défaut - demande les informations à l'utilisateur
+     * Utilise Scanner pour saisir les données depuis la console
      */
     public Account(){
         Scanner sc = new Scanner(System.in);
@@ -39,11 +34,13 @@ public class Account {
         System.out.print("Entrez votre mot de passe : ");
         String password = sc.nextLine();
 
+        // Initialisation des attributs
         this.nom = nom;
         this.prenom = prenom;
         this.email = email;
         this.password = password;
 
+        // CORRECTION: Logique inversée - sauvegarder si l'email n'existe pas
         if(!isEmailExist(this.getEmail())){
             saveAccount();
         } else {
@@ -52,12 +49,11 @@ public class Account {
     }
 
     /**
-     * Parameterized constructor for creating an account with provided details.
-     *
-     * @param nom User's last name
-     * @param prenom User's first name
-     * @param email User's email address
-     * @param password User's password
+     * Constructeur paramétré pour créer un compte avec des valeurs spécifiques
+     * @param nom Nom de famille
+     * @param prenom Prénom
+     * @param email Adresse email (doit être unique)
+     * @param password Mot de passe
      */
     public Account(String nom, String prenom, String email, String password){
         this.nom = nom;
@@ -65,99 +61,66 @@ public class Account {
         this.email = email;
         this.password = password;
 
+        // Sauvegarde automatique si l'email n'existe pas déjà
         if(!isEmailExist(this.getEmail())){
             saveAccount();
         }
     }
 
-    /**
-     * Gets the user's last name.
-     *
-     * @return The user's last name
-     */
+    // Getters - méthodes d'accès aux attributs privés
     public String getNom(){
         return this.nom;
     }
 
-    /**
-     * Gets the user's first name.
-     *
-     * @return The user's first name
-     */
     public String getPrenom(){
         return this.prenom;
     }
 
-    /**
-     * Gets the user's email address.
-     *
-     * @return The user's email address
-     */
     public String getEmail(){
         return this.email;
     }
 
-    /**
-     * Sets the user's last name.
-     *
-     * @param nom The new last name
-     */
+    // Setters - méthodes de modification des attributs
     public void setNom(String nom) {
         this.nom = nom;
     }
 
-    /**
-     * Sets the user's first name.
-     *
-     * @param prenom The new first name
-     */
     public void setPrenom(String prenom) {
         this.prenom = prenom;
     }
 
-    /**
-     * Sets the user's email address.
-     *
-     * @param email The new email address
-     */
     public void setEmail(String email) {
         this.email = email;
     }
 
-    /**
-     * Sets the user's password.
-     *
-     * @param password The new password
-     */
     public void setPassword(String password) {
         this.password = password;
     }
 
     /**
-     * Authenticates a user with email and password, and updates current instance with user data.
-     *
-     * @param email The email address to authenticate
-     * @param password The password to authenticate
-     * @return true if authentication successful, false otherwise
+     * Vérifie les identifiants et met à jour l'objet actuel avec les données du compte trouvé
+     * @param email Email de connexion
+     * @param password Mot de passe
+     * @return true si la connexion réussit, false sinon
      */
     public boolean connecter(String email, String password){
         for(int i = 0; i < db.size(); i++){
             if(db.get(i).getEmail().equals(email) && db.get(i).password.equals(password)){
+                // Mise à jour des informations de l'objet actuel
                 this.setNom(db.get(i).nom);
                 this.setPrenom(db.get(i).prenom);
                 this.setEmail(db.get(i).getEmail());
                 this.setPassword(db.get(i).password);
-                return true;
+                return true; // Connexion réussie
             }
         }
-        return false;
+        return false; // Identifiants incorrects
     }
 
     /**
-     * Checks if an email address is already registered in the system.
-     *
-     * @param email The email address to check
-     * @return true if email exists, false otherwise
+     * Vérifie si un email existe déjà dans la base de données
+     * @param email Email à vérifier
+     * @return true si l'email existe, false sinon
      */
     public static boolean isEmailExist(String email){
         for(int i = 0; i < db.size(); i++){
@@ -167,8 +130,8 @@ public class Account {
     }
 
     /**
-     * Saves the current account to the database.
-     * Private method called automatically during account creation.
+     * Sauvegarde le compte dans la base de données
+     * Méthode privée appelée lors de la création d'un compte
      */
     private void saveAccount(){
         db.add(this);
@@ -177,9 +140,9 @@ public class Account {
     }
 
     /**
-     * Gets a copy of all registered accounts.
-     *
-     * @return List of all accounts in the system
+     * Méthode pour obtenir tous les comptes (utile pour l'administration)
+     * Retourne une copie de la liste pour éviter les modifications externes
+     * @return Liste de tous les comptes enregistrés
      */
     public static List<Account> getAllAccounts(){
         return new ArrayList<>(db);

@@ -7,44 +7,40 @@ import produit.Produit;
 import java.util.List;
 
 /**
- * Represents an administrator account with elevated privileges in the e-shop system.
- * Administrators can manage users, products, categories, orders, and view system statistics.
- * Extends the base Account class with administrative functionality.
- *
- * @author E-Shop Development Team
- * @version 1.0
- * @since 1.0
- * @see Account
+ * Classe représentant un administrateur du système e-commerce
+ * Hérite de Account et ajoute des fonctionnalités de gestion et d'administration
  */
 public class Admin extends Account{
 
     /**
-     * Creates an administrator account with the specified credentials.
-     *
-     * @param nom Administrator's last name
-     * @param prenom Administrator's first name
-     * @param email Administrator's email address (must be unique)
-     * @param password Administrator's password
+     * Affiche le mot de passe en clair
      */
-    public Admin(String nom, String prenom, String email, String password){
-        super(nom, prenom, email, password);
-    }
-
-    /**
-     * Displays the administrator's password to the console.
-     * <p><strong>Security Warning:</strong> This method should be removed in production environments
-     * as it exposes sensitive information.</p>
-     *
-     * @deprecated This method poses a security risk and should not be used in production
-     */
-    @Deprecated
     public void afficherMotDePasse(){
         System.out.println("Mon mot de passe est : " + this.password);
     }
 
     /**
-     * Displays all registered users in the system.
-     * Shows user email, name, and whether they have an address configured.
+     * Constructeur pour créer un compte administrateur
+     * @param nom Nom de famille de l'administrateur
+     * @param prenom Prénom de l'administrateur
+     * @param email Email de connexion (doit être unique)
+     * @param password Mot de passe sécurisé
+     */
+    public Admin(String nom, String prenom, String email, String password){
+        super(nom, prenom, email, password);  // Appel du constructeur parent
+    }
+
+    /**
+     * Constructeur par défaut pour créer un compte administrateur.
+     * Appelle le constructeur de la class Account qui demandera la saisie des informations necessaire.
+     */
+    public Admin(){
+        super();
+    }
+
+    /**
+     * Afficher tous les utilisateurs du système
+     * Montre les informations de base et le statut des adresses
      */
     public void displayAllUsers(){
         System.out.println("\n=== TOUS LES UTILISATEURS ===");
@@ -55,8 +51,9 @@ public class Admin extends Account{
             return;
         }
 
+        // Parcours et affichage de tous les comptes utilisateurs
         for(Account account : accounts){
-            if(account instanceof User){
+            if(account instanceof User){  // Filtrer les utilisateurs (exclure les admins)
                 User user = (User) account;
                 System.out.printf("Email: %s | Nom: %s %s | Adresse: %s%n",
                         user.getEmail(),
@@ -69,8 +66,8 @@ public class Admin extends Account{
     }
 
     /**
-     * Displays all orders in the system with their current status.
-     * Shows order ID, user email, item count, total value, and delivery status.
+     * Afficher toutes les commandes du système
+     * Vue d'ensemble de toutes les commandes avec leurs statuts
      */
     public void displayAllOrders(){
         System.out.println("\n=== TOUTES LES COMMANDES ===");
@@ -81,6 +78,7 @@ public class Admin extends Account{
             return;
         }
 
+        // Affichage détaillé de chaque commande
         for(Panier order : orders){
             System.out.printf("ID: %d | User: %s | Items: %d | Total: %.2f€ | Status: %s%n",
                     order.getId(),
@@ -93,38 +91,42 @@ public class Admin extends Account{
     }
 
     /**
-     * Displays comprehensive system statistics including user, product, and order metrics.
-     * Provides insights into system usage, revenue, and business performance.
+     * Afficher les statistiques complètes du système
+     * Tableau de bord avec métriques importantes pour la gestion
      */
     public void displayStatistics(){
         System.out.println("\n=== STATISTIQUES SYSTÈME ===");
 
-        // User statistics
+        // Statistiques des utilisateurs
         List<Account> accounts = Account.getAllAccounts();
         int userCount = accounts.size();
         int usersWithAddress = 0;
+
+        // Comptage des utilisateurs avec adresse
         for(Account account : accounts){
             if(account instanceof User && ((User)account).hasAddress()){
                 usersWithAddress++;
             }
         }
 
-        // Product statistics
+        // Statistiques des produits et catégories
         List<Category> categories = Category.findTouteCategory();
         List<Produit> products = Produit.getAllProducts();
 
-        // Order statistics
+        // Statistiques des commandes et chiffre d'affaires
         List<Panier> orders = Panier.getAllOrders();
-        int validatedOrders = 0;
-        int deliveredOrders = 0;
-        float totalRevenue = 0;
+        int validatedOrders = 0;   // Commandes confirmées
+        int deliveredOrders = 0;   // Commandes livrées
+        float totalRevenue = 0;    // Chiffre d'affaires total
 
+        // Calcul des métriques de commandes
         for(Panier order : orders){
-            if(order.getStatus() == 1) validatedOrders++;
-            if(order.getStatus() == 2) deliveredOrders++;
-            if(order.getStatus() >= 1) totalRevenue += order.getTotalPrice();
+            if(order.getStatus() == 1) validatedOrders++;    // Statut validé
+            if(order.getStatus() == 2) deliveredOrders++;    // Statut livré
+            if(order.getStatus() >= 1) totalRevenue += order.getTotalPrice();  // Revenus des commandes payées
         }
 
+        // Affichage des statistiques organisées par sections
         System.out.println("UTILISATEURS:");
         System.out.println("  Total: " + userCount);
         System.out.println("  Avec adresse: " + usersWithAddress);
@@ -141,53 +143,27 @@ public class Admin extends Account{
     }
 
     /**
-     * Marks an order as delivered by its ID.
-     *
-     * @param orderId The unique identifier of the order to deliver
+     * Livrer une commande spécifique
+     * Change le statut d'une commande validée vers "livrée"
+     * @param orderId Identifiant de la commande à livrer
      */
     public void deliverOrder(int orderId){
         Panier order = Panier.findOrderById(orderId);
         if(order != null){
-            order.livrerPanier();
+            order.livrerPanier();  // Appel de la méthode de livraison
         } else {
             System.out.println("Commande non trouvée avec l'ID: " + orderId);
         }
     }
 
     /**
-     * Finds and displays all orders for a specific user.
-     *
-     * @param email The email address of the user whose orders to find
-     */
-    public void findOrdersByUser(String email){
-        System.out.println("\n=== COMMANDES POUR: " + email + " ===");
-        List<Panier> orders = Panier.getAllOrders();
-        boolean found = false;
-
-        for(Panier order : orders){
-            if(order.getUser().getEmail().equals(email)){
-                System.out.printf("ID: %d | Items: %d | Total: %.2f€ | Status: %s%n",
-                        order.getId(),
-                        order.getItemCount(),
-                        order.getTotalPrice(),
-                        order.getStatusString());
-                found = true;
-            }
-        }
-
-        if(!found){
-            System.out.println("Aucune commande trouvée pour cet utilisateur.");
-        }
-    }
-
-    /**
-     * Updates the price of a product.
-     *
-     * @param productId The unique identifier of the product
-     * @param newPrice The new price to set for the product
+     * Modifier le prix d'un produit
+     * Permet à l'administrateur d'ajuster les prix
+     * @param productId ID du produit à modifier
+     * @param newPrice Nouveau prix en euros
      */
     public void updateProductPrice(int productId, float newPrice){
-        Produit product = Produit.findProduitByIdFast(productId);
+        Produit product = Produit.findProduitById(productId);
         if(product != null){
             float oldPrice = product.getPrix();
             product.setPrix(newPrice);
@@ -199,15 +175,14 @@ public class Admin extends Account{
     }
 
     /**
-     * Removes a product from the entire system.
-     * The product will be removed from all categories.
-     *
-     * @param productId The unique identifier of the product to remove
+     * Supprimer un produit du système
+     * Retire le produit de toutes les catégories
+     * @param productId ID du produit à supprimer
      */
     public void removeProduct(int productId){
-        Produit product = Produit.findProduitByIdFast(productId);
+        Produit product = Produit.findProduitById(productId);
         if(product != null){
-            product.removeFromAllCategories();
+            product.removeFromAllCategories();  // Suppression de toutes les catégories
             System.out.println("Produit '" + product.getNom() + "' supprimé du système.");
         } else {
             System.out.println("Produit non trouvé avec l'ID: " + productId);
@@ -215,31 +190,8 @@ public class Admin extends Account{
     }
 
     /**
-     * Identifies and displays the category with the most products.
-     * Useful for understanding which product categories are most popular.
-     */
-    public void getMostPopularCategory(){
-        List<Category> categories = Category.findTouteCategory();
-        if(categories.isEmpty()){
-            System.out.println("Aucune catégorie trouvée.");
-            return;
-        }
-
-        Category mostPopular = categories.get(0);
-        for(Category category : categories){
-            if(category.getProductCount() > mostPopular.getProductCount()){
-                mostPopular = category;
-            }
-        }
-
-        System.out.printf("Catégorie la plus populaire: %s (%d produits)%n",
-                mostPopular.getNom(), mostPopular.getProductCount());
-    }
-
-    /**
-     * Returns a string representation of the admin object.
-     *
-     * @return String containing admin's basic information
+     * Représentation textuelle de l'administrateur pour l'affichage
+     * @return Description formatée de l'administrateur
      */
     @Override
     public String toString(){
