@@ -1,3 +1,4 @@
+# POO 2025 : EShop Base
 Un système de commerce électronique en ligne de commande basé sur Java qui simule la fonctionnalité d'achat en ligne avec gestion des utilisateurs, catalogue de produits, panier d'achat et traitement des commandes. 🚀 Fonctionnalités
 Pour les utilisateurs
 
