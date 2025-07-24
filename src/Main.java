@@ -206,7 +206,7 @@ public class Main {
     }
 
     /**
-     * CORRECTION: Processus d'inscription d'un nouvel utilisateur
+     * Processus d'inscription d'un nouvel utilisateur
      * Utilise le constructeur par défaut de User qui demande les informations
      */
     private static void registerUser() {
@@ -216,7 +216,7 @@ public class Main {
     }
 
     /**
-     * CORRECTION: Processus de connexion utilisateur amélioré
+     * Processus de connexion utilisateur amélioré
      * Vérifie l'existence de l'email et valide le mot de passe
      */
     private static void loginUser() {
